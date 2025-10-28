@@ -1,25 +1,14 @@
 // vars/deployToNode.groovy
-def call(String nodeLabel, String tomcatUrl) {
-    stage("Deploy to ${nodeLabel}") {
-        echo "Starting deployment on ${nodeLabel} (Tomcat: ${tomcatUrl})"
+def call(String tomcatUrl) {
+    echo "Deploying WAR to Tomcat: ${tomcatUrl}"
 
-        node(nodeLabel) {
-            unstash 'app-war'
+    deploy adapters: [tomcat9(
+        credentialsId: 'tomcat-credentials',
+        path: '',
+        url: "http://${tomcatUrl}/"
+    )],
+    contextPath: null,
+    war: 'target/*.war'
 
-            try {
-                deploy adapters: [tomcat9(
-                    credentialsId: 'tomcat-credentials',
-                    path: '',
-                    url: "http://${tomcatUrl}/"
-                )],
-                contextPath: null,
-                war: 'target/*.war'
-
-                echo "✅ Successfully deployed to ${nodeLabel} (${tomcatUrl})"
-            } catch (err) {
-                echo "❌ Deployment failed on ${nodeLabel} (${tomcatUrl})"
-                error "Deployment to ${nodeLabel} failed: ${err}"
-            }
-        }
-    }
+    echo "✅ Deployment to ${tomcatUrl} completed."
 }
