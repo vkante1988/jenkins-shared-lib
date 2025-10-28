@@ -1,3 +1,4 @@
+// vars/deployToNode.groovy
 def call(String nodeLabel, String tomcatUrl) {
     node(nodeLabel) {
         unstash 'app-war'
